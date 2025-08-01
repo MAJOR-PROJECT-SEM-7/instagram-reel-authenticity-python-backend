@@ -112,7 +112,7 @@ def compress_reel(filename):
                        movflags='+faststart',
                        vf='scale=720:-2')
                 .overwrite_output()
-                .run(capture_stdout=True, check=True)
+                .run(capture_stdout=True)
             )
             
             print("Compression finished successfully")
@@ -146,7 +146,7 @@ def compress_reel(filename):
                            movflags='+faststart',
                            vf='scale=640:-2')  # Scale to 640p width
                     .overwrite_output()
-                    .run(capture_stdout=True, check=True)
+                    .run(capture_stdout=True)
                 )
                 
                 # Remove intermediate temp file
