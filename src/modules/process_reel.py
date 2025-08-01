@@ -1,0 +1,9 @@
+from src.modules.getLinkFromUrl import get_link_from_url
+from src.modules.downloadAndCompress import download_and_compress_video
+from src.modules.getDescription import generate_description_from_video
+
+def process_reel(url):
+    link: dict = get_link_from_url(url)
+    saved_link = download_and_compress_video(link["videoUrl"], link["filename"])
+    description = generate_description_from_video(saved_link)
+    return description
