@@ -2,6 +2,14 @@ from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_google_genai import ChatGoogleGenerativeAI
 
+
+def analysis_to_text(analysis: dict) -> str:
+    return f"""
+    Visual Analysis: {analysis.get("visual_analysis")}
+    Audio Analysis: {analysis.get("audio_analysis")}
+    Meaning: {analysis.get("meaning")}
+    """
+
 def not_worthy_response(description: str, category: str) -> dict:
     try:
         llm = ChatGoogleGenerativeAI(
@@ -27,7 +35,7 @@ def not_worthy_response(description: str, category: str) -> dict:
         \"\"\"{description}\"\"\"
         """)
         chain = prompt | llm | parser
-        result = chain.invoke({"description": description, "category": category})
+        result = chain.invoke({"description": analysis_to_text(description), "category": category})
         return result
 
     except Exception as e:
