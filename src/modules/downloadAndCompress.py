@@ -86,17 +86,13 @@ def compress_reel(filename):
         
         # Get original file size
         original_size = input_path.stat().st_size / (1024 * 1024)  # Size in MB
-        print(f"Original file size: {original_size:.2f} MB")
         
         # If file is already under 2MB, return as is
         if original_size <= 2:
-            print("File is already under 2MB, no compression needed")
             return str(input_path)
         
         # Compress video using ffmpeg-python
         try:
-            print("FFmpeg compression started")
-            
             # First compression attempt
             (
                 ffmpeg
@@ -112,23 +108,17 @@ def compress_reel(filename):
                        movflags='+faststart',
                        vf='scale=720:-2')
                 .overwrite_output()
-                .run(capture_stdout=True)
+                .run(capture_stdout=True, quiet=True)
             )
             
-            print("Compression finished successfully")
-            
         except ffmpeg.Error as e:
-            print(f"FFmpeg error: {e}")
             raise ValueError(f"Compression failed: {str(e)}")
         
         # Check compressed file size
         compressed_size = temp_path.stat().st_size / (1024 * 1024)
-        print(f"Compressed file size: {compressed_size:.2f} MB")
         
         # If still too large, try more aggressive compression
         if compressed_size > 3:
-            print("File still too large, applying more aggressive compression...")
-            
             final_temp_path = reels_dir / f"final_temp_{filename}"
             
             try:
@@ -146,7 +136,7 @@ def compress_reel(filename):
                            movflags='+faststart',
                            vf='scale=640:-2')  # Scale to 640p width
                     .overwrite_output()
-                    .run(capture_stdout=True)
+                    .run(capture_stdout=True, quiet=True)
                 )
                 
                 # Remove intermediate temp file
@@ -156,15 +146,11 @@ def compress_reel(filename):
                 
             except ffmpeg.Error as e:
                 raise ValueError(f"Second compression failed: {str(e)}")
-            
-            final_size = temp_path.stat().st_size / (1024 * 1024)
-            print(f"Final compressed file size: {final_size:.2f} MB")
         
         # Replace original file with compressed version
         input_path.unlink()
         temp_path.rename(input_path)
         
-        print(f"Reel compressed successfully: {input_path}")
         return f"reels/{filename}"
         
     except Exception as error:
@@ -194,11 +180,9 @@ def compress_reel_subprocess(filename):
         
         # Get original file size
         original_size = input_path.stat().st_size / (1024 * 1024)  # Size in MB
-        print(f"Original file size: {original_size:.2f} MB")
         
         # If file is already under 2MB, return as is
         if original_size <= 2:
-            print("File is already under 2MB, no compression needed")
             return str(input_path)
         
         # First compression attempt
@@ -213,26 +197,20 @@ def compress_reel_subprocess(filename):
             '-b:a', '128k',
             '-movflags', '+faststart',
             '-vf', 'scale=720:-2',
-            '-y', str(temp_path)
+            '-y', str(temp_path),
+            '-loglevel', 'quiet'  # Disable logs
         ]
         
-        print("FFmpeg compression started")
         result = subprocess.run(cmd, capture_output=True, text=True)
         
         if result.returncode != 0:
-            print(f"FFmpeg error: {result.stderr}")
             raise ValueError(f"Compression failed: {result.stderr}")
-        
-        print("Compression finished successfully")
         
         # Check compressed file size
         compressed_size = temp_path.stat().st_size / (1024 * 1024)
-        print(f"Compressed file size: {compressed_size:.2f} MB")
         
         # If still too large, try more aggressive compression
         if compressed_size > 3:
-            print("File still too large, applying more aggressive compression...")
-            
             final_temp_path = reels_dir / f"final_temp_{filename}"
             
             cmd2 = [
@@ -246,7 +224,8 @@ def compress_reel_subprocess(filename):
                 '-b:a', '96k',
                 '-movflags', '+faststart',
                 '-vf', 'scale=640:-2',
-                '-y', str(final_temp_path)
+                '-y', str(final_temp_path),
+                '-loglevel', 'quiet'  # Disable logs
             ]
             
             result2 = subprocess.run(cmd2, capture_output=True, text=True)
@@ -258,15 +237,11 @@ def compress_reel_subprocess(filename):
             temp_path.unlink()
             # Move final temp to temp path
             final_temp_path.rename(temp_path)
-            
-            final_size = temp_path.stat().st_size / (1024 * 1024)
-            print(f"Final compressed file size: {final_size:.2f} MB")
         
         # Replace original file with compressed version
         input_path.unlink()
         temp_path.rename(input_path)
         
-        print(f"Reel compressed successfully: {input_path}")
         return f"reels/{filename}"
         
     except Exception as error:
