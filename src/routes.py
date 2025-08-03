@@ -4,6 +4,7 @@ from src.modules.downloadAndCompress import download_and_compress_video
 from src.modules.getDescription import generate_description_from_video
 from src.modules.process_reel import process_reel
 from src.modules.video_check_classifier import get_video_check_info
+from src.modules.notWorthyResponse import not_worthy_response
 
 router = APIRouter()
 
@@ -26,6 +27,12 @@ async def video_description_endpoint(request_data: dict):
 async def video_check_endpoint(request_data: dict):
     description = request_data.get("description")
     return get_video_check_info(description)
+
+@router.post("/notWorthyResponse")
+async def not_worthy_response_endpoint(request_data: dict):
+    description = request_data.get("description")
+    category = request_data.get("category")
+    return not_worthy_response(description, category)
 
 @router.post("/processReel")
 async def process_reel_endpoint(request_data: dict):

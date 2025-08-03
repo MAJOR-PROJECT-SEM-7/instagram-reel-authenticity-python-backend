@@ -53,7 +53,8 @@ def generate_description_from_video(video_url):
         Analyze the attached video and give me a single, focused description. 
         • Concentrate on audio: background sounds, music, speech content, tone.  
         • Concentrate on visuals: key scenes, actions, expressions, transitions.  
-        • Note any on-screen text: captions, graphics, timestamps.  
+        • Note any on-screen text: captions, graphics, timestamps. 
+        • Highlight what is the main message of the video ; what video creator is trying to convey.  
         • Highlight the core facts or claims made.  
         Do NOT include any opening or closing pleasantries—just the raw, descriptive summary.
         """.strip()
