@@ -5,6 +5,7 @@ from src.modules.getDescription import generate_description_from_video
 from src.modules.process_reel import process_reel
 from src.modules.video_check_classifier import get_video_check_info
 from src.modules.notWorthyResponse import not_worthy_response
+from src.websearchengine.pipeline import pipeline
 
 router = APIRouter()
 
@@ -38,3 +39,10 @@ async def not_worthy_response_endpoint(request_data: dict):
 async def process_reel_endpoint(request_data: dict):
     url = request_data.get("url")
     return process_reel(url)
+
+
+
+@router.post("/webSearch")
+async def search_endpoint(request_data: dict):
+    query = request_data.get("query")
+    return pipeline(query)
