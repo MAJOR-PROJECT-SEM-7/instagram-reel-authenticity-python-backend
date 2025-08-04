@@ -13,6 +13,12 @@ def embed_and_search(docs, query):
     index.add(np.array(embeddings))
 
     q_embed = model.encode([query])
-    D, I = index.search(np.array(q_embed), k=5)
+    # Set k to min of 5 or number of documents to avoid index out of range
+    k = min(5, len(doc_texts))
+    if k == 0:
+        return []
+        
+    D, I = index.search(np.array(q_embed), k=k)
     
-    return [doc_texts[i] for i in I[0]]
+    # Check for valid indices before returning
+    return [doc_texts[i] for i in I[0] if 0 <= i < len(doc_texts)]
