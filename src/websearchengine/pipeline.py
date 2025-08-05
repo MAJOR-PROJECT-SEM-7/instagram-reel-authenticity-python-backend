@@ -23,5 +23,5 @@ def pipeline(query: str):
     print(results)
     summary = summarize_data(results, query)
     print(summary)
-    return {"summary": summary, "sources": urls}
+    return {"summary": summary, "sources": urls , "score": results}
     # return {"summary": summary, "sources": urls}
