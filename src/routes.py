@@ -9,6 +9,10 @@ from src.websearchengine.pipeline import pipeline
 from src.modules.videotoaudio import video_to_text
 
 router = APIRouter()
+# sample route to check if the server is running
+@router.get("/")
+async def root():
+    return {"message": "Welcome to the Video Processing API"}
 
 @router.get("/getLink")
 async def get_link_endpoint(url: str):
