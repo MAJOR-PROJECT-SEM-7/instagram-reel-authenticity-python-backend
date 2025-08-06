@@ -91,9 +91,8 @@ def compress_reel(filename):
         if original_size <= 2:
             return str(input_path)
         
-        # Compress video using ffmpeg-python
+        # First compression attempt using ffmpeg-python
         try:
-            # First compression attempt
             (
                 ffmpeg
                 .input(str(input_path))
@@ -110,7 +109,6 @@ def compress_reel(filename):
                 .overwrite_output()
                 .run(capture_stdout=True, quiet=True)
             )
-            
         except ffmpeg.Error as e:
             raise ValueError(f"Compression failed: {str(e)}")
         
@@ -138,100 +136,8 @@ def compress_reel(filename):
                     .overwrite_output()
                     .run(capture_stdout=True, quiet=True)
                 )
-                
-                # Remove intermediate temp file
-                temp_path.unlink()
-                # Move final temp to temp path
-                final_temp_path.rename(temp_path)
-                
             except ffmpeg.Error as e:
                 raise ValueError(f"Second compression failed: {str(e)}")
-        
-        # Replace original file with compressed version
-        input_path.unlink()
-        temp_path.rename(input_path)
-        
-        return f"reels/{filename}"
-        
-    except Exception as error:
-        # Clean up temp files if they exist
-        temp_path = reels_dir / f"temp_{filename}"
-        final_temp_path = reels_dir / f"final_temp_{filename}"
-        
-        if temp_path.exists():
-            temp_path.unlink()
-        if final_temp_path.exists():
-            final_temp_path.unlink()
-        
-        print(f"Error compressing reel: {error}")
-        raise ValueError(f"Failed to compress reel: {str(error)}")
-
-
-# Alternative implementation using subprocess instead of ffmpeg-python
-def compress_reel_subprocess(filename):
-    """Alternative compression method using subprocess (if ffmpeg-python is not available)"""
-    try:
-        input_path = reels_dir / filename
-        temp_path = reels_dir / f"temp_{filename}"
-        
-        # Check if file exists
-        if not input_path.exists():
-            raise ValueError(f"File not found: {input_path}")
-        
-        # Get original file size
-        original_size = input_path.stat().st_size / (1024 * 1024)  # Size in MB
-        
-        # If file is already under 2MB, return as is
-        if original_size <= 2:
-            return str(input_path)
-        
-        # First compression attempt
-        cmd = [
-            'ffmpeg', '-i', str(input_path),
-            '-c:v', 'libx264',
-            '-preset', 'fast',
-            '-crf', '28',
-            '-maxrate', '1M',
-            '-bufsize', '2M',
-            '-c:a', 'aac',
-            '-b:a', '128k',
-            '-movflags', '+faststart',
-            '-vf', 'scale=720:-2',
-            '-y', str(temp_path),
-            '-loglevel', 'quiet'  # Disable logs
-        ]
-        
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        
-        if result.returncode != 0:
-            raise ValueError(f"Compression failed: {result.stderr}")
-        
-        # Check compressed file size
-        compressed_size = temp_path.stat().st_size / (1024 * 1024)
-        
-        # If still too large, try more aggressive compression
-        if compressed_size > 3:
-            final_temp_path = reels_dir / f"final_temp_{filename}"
-            
-            cmd2 = [
-                'ffmpeg', '-i', str(temp_path),
-                '-c:v', 'libx264',
-                '-preset', 'fast',
-                '-crf', '32',
-                '-maxrate', '800k',
-                '-bufsize', '1600k',
-                '-c:a', 'aac',
-                '-b:a', '96k',
-                '-movflags', '+faststart',
-                '-vf', 'scale=640:-2',
-                '-y', str(final_temp_path),
-                '-loglevel', 'quiet'  # Disable logs
-            ]
-            
-            result2 = subprocess.run(cmd2, capture_output=True, text=True)
-            
-            if result2.returncode != 0:
-                raise ValueError(f"Second compression failed: {result2.stderr}")
             
             # Remove intermediate temp file
             temp_path.unlink()
@@ -256,6 +162,9 @@ def compress_reel_subprocess(filename):
         
         print(f"Error compressing reel: {error}")
         raise ValueError(f"Failed to compress reel: {str(error)}")
+
+
+
 
 
 # Example usage:

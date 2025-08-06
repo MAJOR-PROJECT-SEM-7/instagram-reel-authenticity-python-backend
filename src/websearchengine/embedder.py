@@ -1,24 +1,32 @@
 from sentence_transformers import SentenceTransformer
-import faiss
-import numpy as np
+from sklearn.neighbors import NearestNeighbors
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
-index = faiss.IndexFlatL2(384)
+nn_model = None
 doc_texts = []
+embeddings_cache = None
 
 def embed_and_search(docs, query):
-    global doc_texts
-    doc_texts = [doc['text'][:1000] for doc in docs]  # truncate for speed
-    embeddings = model.encode(doc_texts)
-    index.add(np.array(embeddings))
-
-    q_embed = model.encode([query])
-    # Set k to min of 5 or number of documents to avoid index out of range
-    k = min(5, len(doc_texts))
-    if k == 0:
-        return []
-        
-    D, I = index.search(np.array(q_embed), k=k)
+    global doc_texts, nn_model, embeddings_cache
+    doc_texts = [doc['text'][:1000] for doc in docs]
     
-    # Check for valid indices before returning
-    return [doc_texts[i] for i in I[0] if 0 <= i < len(doc_texts)]
+    if len(doc_texts) == 0:
+        return []
+    
+    # Cache embeddings for efficiency
+    embeddings_cache = model.encode(doc_texts)
+    
+    # Use cosine similarity for better text matching
+    nn_model = NearestNeighbors(
+        n_neighbors=min(5, len(doc_texts)), 
+        metric='cosine'
+    )
+    nn_model.fit(embeddings_cache)
+    
+    # Search
+    q_embed = model.encode([query])
+    distances, indices = nn_model.kneighbors(q_embed)
+    
+    return [doc_texts[i] for i in indices[0] if 0 <= i < len(doc_texts)]
+
+# No additional installation needed - sklearn comes with most Python setups
