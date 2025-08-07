@@ -5,9 +5,9 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 def analysis_to_text(analysis: dict) -> str:
     return f"""
-    Visual Analysis: {analysis.get("visual_analysis")}
-    Audio Analysis: {analysis.get("audio_analysis")}
-    Meaning: {analysis.get("meaning")}
+    Category: {analysis.get("category")}
+    Core Message: {analysis.get("core_message")}
+    Evidence Used: {analysis.get("evidence_used")}
     """
 
 def not_worthy_response(description: str, category: str) -> dict:

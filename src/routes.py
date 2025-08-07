@@ -27,7 +27,8 @@ async def download_and_compress_endpoint(request_data: dict):
 @router.post("/videoDescription")
 async def video_description_endpoint(request_data: dict):
     video_url = request_data.get("videoUrl")
-    return generate_description_from_video(video_url)
+    audio_transcript = request_data.get("audioTranscript")
+    return generate_description_from_video(video_url, audio_transcript)
 
 @router.post("/videoCheck")
 async def video_check_endpoint(request_data: dict):

@@ -13,17 +13,14 @@ def embed_and_search(docs, query):
     if len(doc_texts) == 0:
         return []
     
-    # Cache embeddings for efficiency
     embeddings_cache = model.encode(doc_texts)
     
-    # Use cosine similarity for better text matching
     nn_model = NearestNeighbors(
         n_neighbors=min(5, len(doc_texts)), 
         metric='cosine'
     )
     nn_model.fit(embeddings_cache)
     
-    # Search
     q_embed = model.encode([query])
     distances, indices = nn_model.kneighbors(q_embed)
     

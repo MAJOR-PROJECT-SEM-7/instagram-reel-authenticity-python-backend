@@ -1,6 +1,6 @@
 import whisper
 import os
-import subprocess
+from audio_extract import extract_audio
 
 
 def video_to_audio(video_path):
@@ -30,36 +30,12 @@ def video_to_audio(video_path):
         print(f"Error: Video file not found at path: {video_path}")
         return None
     
-    # Use ffmpeg to extract audio from video with more robust error handling
+    # Use audio_extract to extract audio from video
     try:
-        # Use simpler ffmpeg command without -map option
-        result = subprocess.run(
-            ["ffmpeg", "-i", video_path, "-vn", "-acodec", "libmp3lame", "-q:a", "2", audio_path],
-            check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
-        )
+        extract_audio(input_path=video_path, output_path=audio_path)
         return audio_path
-    except subprocess.CalledProcessError as e:
-        print(f"Error extracting audio: {e}")
-        print(f"STDERR: {e.stderr}")
-        # Try alternative approach if first method fails
-        try:
-            result = subprocess.run(
-                ["ffmpeg", "-i", video_path, "-vn", audio_path],
-                check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
-            )
-            return audio_path
-        except subprocess.CalledProcessError as e2:
-            print(f"Second attempt failed: {e2}")
-            print(f"STDERR: {e2.stderr}")
-            return None
     except Exception as e:
-        print(f"Unexpected error during audio extraction: {str(e)}")
+        print(f"Error extracting audio: {str(e)}")
         return None
 
 def audio_to_text(audio_path):
@@ -71,5 +47,5 @@ def video_to_text(video_path):
     audio_path = video_to_audio(video_path)
     if audio_path:
         text = audio_to_text(audio_path)
-        return {"text": text}
-    return {"error": "Failed to extract audio from video"}
+        return text
+    return None 
