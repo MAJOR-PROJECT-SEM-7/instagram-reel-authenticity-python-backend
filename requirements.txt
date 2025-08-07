@@ -13,3 +13,4 @@ numpy
 httpx
 duckduckgo_search
 audio-extract
+ddgs
