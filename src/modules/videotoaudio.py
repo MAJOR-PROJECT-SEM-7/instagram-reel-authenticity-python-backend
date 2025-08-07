@@ -1,9 +1,10 @@
 import whisper
 import os
+from typing import Optional
 from audio_extract import extract_audio
 
 
-def video_to_audio(video_path):
+def video_to_audio(video_path: str) -> Optional[str]:
     # Check if video path is absolute or relative
     if video_path.startswith("/"):
         video_path = os.path.join(os.getcwd(), video_path[1:])  # Remove leading slash
@@ -38,12 +39,12 @@ def video_to_audio(video_path):
         print(f"Error extracting audio: {str(e)}")
         return None
 
-def audio_to_text(audio_path):
+def audio_to_text(audio_path: str) -> str:
     model = whisper.load_model("base")
     result = model.transcribe(audio_path, task="translate")
     return result["text"]
 
-def video_to_text(video_path):
+def video_to_text(video_path: str) -> Optional[str]:
     audio_path = video_to_audio(video_path)
     if audio_path:
         text = audio_to_text(audio_path)

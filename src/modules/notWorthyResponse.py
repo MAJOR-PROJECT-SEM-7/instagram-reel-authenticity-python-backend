@@ -1,16 +1,17 @@
+from typing import Dict, Any, Union
 from langchain.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 
-def analysis_to_text(analysis: dict) -> str:
+def analysis_to_text(analysis: Dict[str, Any]) -> str:
     return f"""
     Category: {analysis.get("category")}
     Core Message: {analysis.get("core_message")}
     Evidence Used: {analysis.get("evidence_used")}
     """
 
-def not_worthy_response(description: str, category: str) -> dict:
+def not_worthy_response(description: Union[str, Dict[str, Any]], category: str) -> Dict[str, Any]:
     try:
         llm = ChatGoogleGenerativeAI(
             model="gemini-1.5-flash",

@@ -3,7 +3,6 @@ from src.modules.getLinkFromUrl import get_link_from_url
 from src.modules.downloadAndCompress import download_and_compress_video
 from src.modules.getDescription import generate_description_from_video
 from src.modules.process_reel import process_reel
-from src.modules.video_check_classifier import get_video_check_info
 from src.modules.notWorthyResponse import not_worthy_response
 from src.websearchengine.pipeline import pipeline
 from src.modules.videotoaudio import video_to_text
@@ -29,11 +28,6 @@ async def video_description_endpoint(request_data: dict):
     video_url = request_data.get("videoUrl")
     audio_transcript = request_data.get("audioTranscript")
     return generate_description_from_video(video_url, audio_transcript)
-
-@router.post("/videoCheck")
-async def video_check_endpoint(request_data: dict):
-    description = request_data.get("description")
-    return get_video_check_info(description)
 
 @router.post("/notWorthyResponse")
 async def not_worthy_response_endpoint(request_data: dict):

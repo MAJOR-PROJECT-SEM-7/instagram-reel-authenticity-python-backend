@@ -1,3 +1,4 @@
+from typing import List, Union
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from core.config import settings
@@ -10,7 +11,7 @@ llm = ChatGoogleGenerativeAI(
     temperature=0.5
 )
 
-def summarize_data(text_blocks, query):
+def summarize_data(text_blocks: List[str], query: str) -> str:
     context = "\n\n".join(text_blocks)
 
     prompt_template = ChatPromptTemplate.from_template(

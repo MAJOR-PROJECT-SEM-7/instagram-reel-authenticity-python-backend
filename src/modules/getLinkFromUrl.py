@@ -2,18 +2,19 @@ import re
 import json
 import time
 import urllib.parse
+from typing import Dict, Any, Optional
 import requests
 from bs4 import BeautifulSoup
 
 
 # Custom error class
 class HTTPError(Exception):
-    def __init__(self, message, status):
+    def __init__(self, message: str, status: int) -> None:
         super().__init__(message)
         self.status = status
 
 
-def get_link_from_url(url):
+def get_link_from_url(url: str) -> Dict[str, Any]:
     """Main function to get video link from Instagram URL"""
     print(f"url: {url}")
     
@@ -38,7 +39,7 @@ def get_link_from_url(url):
         raise ValueError(str(error))
 
 
-def get_post_id_from_url(post_url):
+def get_post_id_from_url(post_url: str) -> str:
     """Extract post ID from Instagram URL"""
     # Updated regex patterns for better matching
     share_regex = r"^https://(?:www\.)?instagram\.com/share/([a-zA-Z0-9_-]+)/?.*"
@@ -105,7 +106,7 @@ def fetch_reel_id_from_share_url(share_url):
         raise error
 
 
-def is_valid_instagram_url(post_url):
+def is_valid_instagram_url(post_url: str) -> Optional[str]:
     """Function to validate Instagram URLs"""
     if not post_url:
         return "Instagram URL was not provided"
@@ -256,7 +257,7 @@ def get_video_json_from_graphql(post_id):
     return video_info
 
 
-def get_video_info(post_id):
+def get_video_info(post_id: str) -> Dict[str, Any]:
     """Main function to get video info using multiple methods"""
     video_info = None
     

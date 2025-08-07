@@ -1,9 +1,10 @@
+from typing import Dict, Any, List
 from src.websearchengine.search import get_search_results
 from src.websearchengine.scraper import scrape_all_urls
 from src.websearchengine.embedder import embed_and_search
 from src.websearchengine.summarizer import summarize_data
 
-def pipeline(query: str):
+def pipeline(query: str) -> Dict[str, Any]:
     if not query or not isinstance(query, str):
         return {"summary": [], "sources": [], "error": "Invalid query"}
     

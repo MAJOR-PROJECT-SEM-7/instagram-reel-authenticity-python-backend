@@ -1,6 +1,7 @@
 import subprocess
 import requests
 from pathlib import Path
+from typing import Optional, Dict, Any
 import ffmpeg
 
 
@@ -9,7 +10,7 @@ reels_dir = Path.cwd() / "reels"
 reels_dir.mkdir(parents=True, exist_ok=True)
 
 
-def check_ffmpeg_installation():
+def check_ffmpeg_installation() -> bool:
     """Function to check if ffmpeg is installed"""
     try:
         # Try to get ffmpeg version
@@ -23,7 +24,7 @@ def check_ffmpeg_installation():
         return False
 
 
-def download_and_compress_video(url, filename):
+def download_and_compress_video(url: str, filename: str) -> Optional[str]:
     """Main function to download and compress video"""
     try:
         if not url or not filename:
@@ -44,7 +45,7 @@ def download_and_compress_video(url, filename):
         raise ValueError("Failed to download and compress reel")
 
 
-def download_reel(url, filename):
+def download_reel(url: str, filename: str) -> str:
     """Download video file from URL"""
     try:
         file_path = reels_dir / filename
@@ -74,7 +75,7 @@ def download_reel(url, filename):
         raise ValueError(f"Failed to download reel: {str(error)}")
 
 
-def compress_reel(filename):
+def compress_reel(filename: str) -> str:
     """Compress video file using ffmpeg"""
     try:
         input_path = reels_dir / filename
