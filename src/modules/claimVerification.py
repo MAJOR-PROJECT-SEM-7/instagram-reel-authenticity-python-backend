@@ -44,9 +44,10 @@ def can_verify_with_llm(claim: str) -> Dict[str, Any]:
         Claim: "{claim}"
 
         Consider these factors:
-        1. Is this about general knowledge, historical facts, scientific principles, or well-established information?
+        1. Is this about general knowledge, historical facts, scientific principles, a event or news happened in the past or well-established information?
         2. Does it require current events, recent news, specific statistics, or real-time data?
         3. Does it involve specific people, companies, or events that might have recent developments?
+        4. Is this a fact or an opinion?
 
         Respond in JSON format:
         {{
@@ -72,7 +73,7 @@ def can_verify_with_llm(claim: str) -> Dict[str, Any]:
         return result
         
     except Exception as e:
-        print(f"Error in can_verify_with_llm: {e}")
+        # print(f"Error in can_verify_with_llm: {e}")
         return {
             "can_verify_with_llm": False,
             "reasoning": f"Error occurred: {str(e)}",
@@ -150,7 +151,7 @@ def verify_claim_with_llm(claim: str, evidence: str) -> Dict[str, Any]:
         return result_dict
         
     except Exception as e:
-        print(f"Error in verify_claim_with_llm: {e}")
+        # print(f"Error in verify_claim_with_llm: {e}")
         return {
             "claim": claim,
             "can_verify_with_llm": True,
@@ -171,7 +172,7 @@ def verify_claim_with_web_search(claim: str, evidence: str) -> Dict[str, Any]:
         web_results = pipeline(search_query)
         
         if web_results.get("error"):
-            print(f"Web search error: {web_results['error']}")
+            # print(f"Web search error: {web_results['error']}")
             return create_unverifiable_result(claim, "Web search failed")
         
         # Now use LLM to analyze the web search results
@@ -246,7 +247,7 @@ def verify_claim_with_web_search(claim: str, evidence: str) -> Dict[str, Any]:
         return result_dict
         
     except Exception as e:
-        print(f"Error in verify_claim_with_web_search: {e}")
+        # print(f"Error in verify_claim_with_web_search: {e}")
         return create_unverifiable_result(claim, f"Error during web verification: {str(e)}")
 
 
@@ -276,10 +277,10 @@ def verify_individual_claim(claim: Dict[str, Any]) -> Dict[str, Any]:
     llm_check = can_verify_with_llm(claim_text)
     
     if llm_check.get("can_verify_with_llm", False):
-        print(f"Verifying with LLM: {claim_text}")
+        # print(f"Verifying with LLM: {claim_text}")
         return verify_claim_with_llm(claim_text, evidence)
     else:
-        print(f"Verifying with web search: {claim_text}")
+        # print(f"Verifying with web search: {claim_text}")
         return verify_claim_with_web_search(claim_text, evidence)
 
 
@@ -351,7 +352,7 @@ def generate_overall_assessment(claim_results: List[Dict[str, Any]]) -> Dict[str
         return result_dict
         
     except Exception as e:
-        print(f"Error in generate_overall_assessment: {e}")
+        # print(f"Error in generate_overall_assessment: {e}")
         return {
             "overall_authenticity": "Error in Assessment",
             "overall_score": 0.5,

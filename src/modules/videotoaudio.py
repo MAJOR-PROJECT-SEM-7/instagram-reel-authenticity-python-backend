@@ -23,12 +23,12 @@ def video_to_audio(video_path: str) -> Optional[str]:
     
     # Check if audio already exists
     if os.path.exists(audio_path):
-        print(f"Audio file already exists at: {audio_path}")
+        # print(f"Audio file already exists at: {audio_path}")
         return audio_path
     
     # Check if the video file exists
     if not os.path.exists(video_path):
-        print(f"Error: Video file not found at path: {video_path}")
+        # print(f"Error: Video file not found at path: {video_path}")
         return None
     
     # Use audio_extract to extract audio from video
@@ -36,7 +36,7 @@ def video_to_audio(video_path: str) -> Optional[str]:
         extract_audio(input_path=video_path, output_path=audio_path)
         return audio_path
     except Exception as e:
-        print(f"Error extracting audio: {str(e)}")
+        # print(f"Error extracting audio: {str(e)}")
         return None
 
 def audio_to_text(audio_path: str) -> str:

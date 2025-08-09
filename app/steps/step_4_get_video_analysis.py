@@ -42,7 +42,7 @@ class VideoAnalysis(BaseModel):
 def generate_description_from_video(video_url: str, transcript: Optional[str] = None) -> Dict[str, Any]:
     try:
         if not video_url:
-            raise ValueError("videoUrl is required")
+            return {"success": False}
 
         if video_url.startswith("/"):
             video_path = Path.cwd() / video_url[1:]
@@ -50,14 +50,12 @@ def generate_description_from_video(video_url: str, transcript: Optional[str] = 
             video_path = Path.cwd() / video_url
 
         if not video_path.exists():
-            raise FileNotFoundError("Video file not found")
-
-        if transcript:
-            print("Using provided transcript to enhance analysis")
+            return {"success": False}
 
         google_api_key = settings.GOOGLE_API_KEY
+
         if not google_api_key:
-            raise ValueError("Google API key not configured")
+            return {"success": False}
 
         llm = ChatGoogleGenerativeAI(
             model="gemini-1.5-flash",
@@ -131,14 +129,11 @@ Use the transcript below to understand context. Do not include it in your final 
             ]
         )
 
-        # print("Generating structured video analysis...")
-
         response = llm.invoke([message])
 
         try:
             parsed_analysis = parser.parse(response.content)
         except Exception as parse_error:
-            # print(f"JSON parsing error: {parse_error}")
             try:
                 import re
                 json_match = re.search(r'\{.*\}', response.content, re.DOTALL)
@@ -155,34 +150,21 @@ Use the transcript below to understand context. Do not include it in your final 
                     "raw_response": response.content
                 }
 
-        # print("Structured analysis generated successfully")
-
         response_data = {
             "success": True,
-            "videoUrl": video_url,
             "analysis": parsed_analysis,
-            "fileSize": f"{len(video_buffer) / (1024 * 1024):.2f} MB",
-            "mimeType": mime_type,
         }
-
-        if transcript:
-            response_data["transcriptProvided"] = True
-            response_data["transcriptLength"] = len(transcript)
-        else:
-            response_data["transcriptProvided"] = False
 
         return response_data
 
     except Exception as error:
-        # print(f"Error in VideoAnalysis: {error}")
-
         if isinstance(error, FileNotFoundError) or (hasattr(error, 'errno') and error.errno == 2):
-            raise ValueError("Video file not found")
+            return {"success": False}
 
         if "API key" in str(error):
-            raise ValueError("Invalid or missing Google API key")
+            return {"success": False}
 
         if "quota" in str(error).lower() or "limit" in str(error).lower():
-            raise ValueError("API quota exceeded. Please try again later.")
+            return {"success": False}
 
-        raise ValueError(f"Failed to generate video analysis: {str(error)}")
+        return {"success": False}

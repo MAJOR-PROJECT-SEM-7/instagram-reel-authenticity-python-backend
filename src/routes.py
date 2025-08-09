@@ -6,6 +6,7 @@ from src.modules.process_reel import process_reel
 from src.modules.notWorthyResponse import not_worthy_response
 from src.websearchengine.pipeline import pipeline
 from src.modules.videotoaudio import video_to_text
+from app.flow import check_authenticity
 
 router = APIRouter()
 # sample route to check if the server is running

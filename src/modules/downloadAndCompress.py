@@ -20,7 +20,7 @@ def check_ffmpeg_installation() -> bool:
                       check=True)
         return True
     except (subprocess.CalledProcessError, FileNotFoundError):
-        print("FFmpeg is not installed or not in PATH. Please install FFmpeg: https://ffmpeg.org/download.html")
+        # print("FFmpeg is not installed or not in PATH. Please install FFmpeg: https://ffmpeg.org/download.html")
         return False
 
 
@@ -34,14 +34,14 @@ def download_and_compress_video(url: str, filename: str) -> Optional[str]:
         
         # Check if ffmpeg is installed before attempting compression
         if not check_ffmpeg_installation():
-            print("FFmpeg not found. Skipping compression and returning uncompressed video.")
+            # print("FFmpeg not found. Skipping compression and returning uncompressed video.")
             return f"/reels/{filename}"
         
         compress_reel(filename)
         return f"/reels/{filename}"
         
     except Exception as error:
-        print(f"Error in ReelDownloadandCompressor: {error}")
+        # print(f"Error in ReelDownloadandCompressor: {error}")
         raise ValueError("Failed to download and compress reel")
 
 
@@ -67,11 +67,11 @@ def download_reel(url: str, filename: str) -> str:
                 if chunk:
                     writer.write(chunk)
         
-        print(f"Reel downloaded successfully: {file_path}")
+        # print(f"Reel downloaded successfully: {file_path}")
         return str(file_path)
         
     except Exception as error:
-        print(f"Error downloading reel: {error}")
+        # print(f"Error downloading reel: {error}")
         raise ValueError(f"Failed to download reel: {str(error)}")
 
 
@@ -161,7 +161,7 @@ def compress_reel(filename: str) -> str:
         if final_temp_path.exists():
             final_temp_path.unlink()
         
-        print(f"Error compressing reel: {error}")
+        # print(f"Error compressing reel: {error}")
         raise ValueError(f"Failed to compress reel: {str(error)}")
 
 
@@ -174,5 +174,5 @@ if __name__ == "__main__":
     # url = "https://example.com/video.mp4"
     # filename = "example_video.mp4"
     # result = download_and_compress_video(url, filename)
-    # print(f"Video processed: {result}")
+    # # print(f"Video processed: {result}")
     pass

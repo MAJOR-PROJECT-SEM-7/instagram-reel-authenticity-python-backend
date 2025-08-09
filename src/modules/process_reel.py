@@ -11,16 +11,16 @@ def process_reel(url: str) -> Dict[str, Any]:
     start_time = time.time()
     
     link: dict = get_link_from_url(url)
-    print(f"Get link time: {time.time() - start_time:.2f} seconds")
+    # print(f"Get link time: {time.time() - start_time:.2f} seconds")
     
     saved_link = download_and_compress_video(link["videoUrl"], link["filename"])
-    print(f"Download and compress time: {time.time() - start_time:.2f} seconds")
+    # print(f"Download and compress time: {time.time() - start_time:.2f} seconds")
     
     audio_transcript = video_to_text(saved_link)
-    print(f"Audio transcription time: {time.time() - start_time:.2f} seconds")
+    # print(f"Audio transcription time: {time.time() - start_time:.2f} seconds")
     
     description = generate_description_from_video(saved_link, audio_transcript)
-    print(f"Generate description time: {time.time() - start_time:.2f} seconds")
+    # print(f"Generate description time: {time.time() - start_time:.2f} seconds")
     
     
     description["audioTranscript"] = audio_transcript
@@ -31,10 +31,10 @@ def process_reel(url: str) -> Dict[str, Any]:
     
     if not description.get("isWorthChecking"):
         description["notWorthyResponse"] = not_worthy_response(description.get("analysis"), description.get("category"))
-        print(f"Not worthy response time: {time.time() - start_time:.2f} seconds")
+        # print(f"Not worthy response time: {time.time() - start_time:.2f} seconds")
     else:
         # Video is worth verifying - perform claim-by-claim verification
-        print("Starting claim verification process...")
+        # print("Starting claim verification process...")
         verification_start = time.time()
         
         # Get claims from the analysis
@@ -45,7 +45,7 @@ def process_reel(url: str) -> Dict[str, Any]:
             # Verify all claims
             verification_result = verify_all_claims(claims)
             description["verificationResult"] = verification_result
-            print(f"Claim verification completed in {time.time() - verification_start:.2f} seconds")
+            # print(f"Claim verification completed in {time.time() - verification_start:.2f} seconds")
         else:
             # No claims found, but video was marked as worth verifying
             description["verificationResult"] = {
@@ -55,7 +55,7 @@ def process_reel(url: str) -> Dict[str, Any]:
                 "individual_claims": [],
                 "recommendation": "The video may contain general information but lacks specific verifiable claims."
             }
-            print("No claims found for verification")
+            # print("No claims found for verification")
     
-    print(f"Total processing time: {time.time() - start_time:.2f} seconds")
+    # print(f"Total processing time: {time.time() - start_time:.2f} seconds")
     return description
