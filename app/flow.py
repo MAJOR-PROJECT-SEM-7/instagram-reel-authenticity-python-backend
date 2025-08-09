@@ -3,6 +3,7 @@ from app.steps.step_2_save_video_and_audio_locally import save_video_and_audio_l
 from app.steps.step_3_get_audio_transcription import audio_to_text
 from app.steps.step_4_get_video_analysis import generate_description_from_video
 from app.steps.step_5_if_not_worthy_response import not_worthy_response
+from app.steps.step_6_if_worthy_response import if_worthy_response
 
 def check_authenticity(url: str,log: bool = False):
     # get the link from the url
@@ -94,6 +95,13 @@ def check_authenticity(url: str,log: bool = False):
             print("Not worthy response generated")
         return not_worthy_response_data
     
+    # if the video is worthy, get the if worthy response
+    if log:
+        print("Video is worthy")
+    if_worthy_response_data = if_worthy_response(description['analysis']['claims'],log)
+    if log:
+        print("If worthy response generated")
+    return if_worthy_response_data
     # return the description
 
     
