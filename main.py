@@ -3,10 +3,13 @@ from src.routes import router
 from app.flow import check_authenticity, check_authenticity_websocket
 import json
 from testing_backend.auth import router as auth_router
+from testing_backend.entires import router as entries_router
 
 app = FastAPI()
 app.include_router(router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
+app.include_router(entries_router, prefix="/api")
+
 
 @app.post("/api/checkAuthenticity")
 async def check_authenticity_endpoint(request_data: dict):
