@@ -1,5 +1,6 @@
 fastapi
-uvicorn
+uvicorn[standard]
+websockets
 dotenv
 requests
 ffmpeg-python
@@ -14,3 +15,7 @@ httpx
 duckduckgo_search
 audio-extract
 ddgs
+pymongo
+bcrypt
+python-jose[cryptography]
+pydantic[email]
