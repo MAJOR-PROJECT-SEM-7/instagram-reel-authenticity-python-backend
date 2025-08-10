@@ -9,16 +9,18 @@ def optimize_query(query: str) -> str:
             google_api_key=settings.GOOGLE_API_KEY,
             temperature=0.1
         )
-        prompt = ChatPromptTemplate.from_template(
-            """
-You are an assistant that helps optimize queries for web search engines.
-Given a user query, rewrite it to be concise, clear, and effective for web search.
-Return ONLY the optimized query, nothing else.
+        prompt = ChatPromptTemplate.from_template("""
+You are an assistant that rewrites user queries for DuckDuckGo to get the most relevant, recent results.
+Rules:
+- Keep exact names, places, and key facts from the original query.
+- Add words like 'news', 'latest', or 'breaking' if the query is about an event.
+- Remove unrelated words that do not help in search.
+- Return ONLY the optimized query.
 
 User Query: {query}
 Optimized Query:
-            """
-        )
+        """)
+
         chain = prompt | llm
         response = chain.invoke({"query": query})
         # If the response is a dict with 'content', extract it, else return as string
