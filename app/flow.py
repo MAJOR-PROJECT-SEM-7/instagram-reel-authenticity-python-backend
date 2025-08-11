@@ -52,12 +52,12 @@ def check_authenticity(url: str, log: bool = False):
             print("Transcription generated")
         else:
             print("Failed to get transcription")
-    if not transcription:
-        fail_msg = {'success': False, 'message': 'Failed to get transcription'}
-        if log:
-            results['final'] = fail_msg
-            return results
-        return fail_msg
+    # if not transcription:
+    #     fail_msg = {'success': False, 'message': 'Failed to get transcription'}
+    #     if log:
+    #         results['final'] = fail_msg
+    #         return results
+    #     return fail_msg
 
     # get the analysis of the video
     if log:
