@@ -79,9 +79,14 @@ Tasks:
     - If it's just humor, entertainment, or doesn't contain any factual claims, set is_worthy to false and explain why in why_not_worthy.
 
 3. If is_worthy is true, extract each major claim made:
-    - claim: The specific message or assertion.
+    - claim: The specific message or assertion in the video with specific details.
     - evidence: What in the video supports it? (captions, speech, visuals)
     - is_worth_verifying: Whether it seems controversial, exaggerated, or false enough to need checking.
+
+Special instruction:
+- If the video is about the sale of something (such as a product, service, or item being offered for purchase), the claim should be written in the following format: "this item is at this price in this place" (for example, "This phone is available for $299 at StoreX , City , State , Country "). Make sure to extract the item, price, and place from the video if possible, and use this format for the claim.
+- DO NOT use general words like "this" or "that" keep it specific as it will be used to verify the claim.
+- If transcript is provided, and its good enough, use it more to understand the context of the video.
 """
 
         if transcript:

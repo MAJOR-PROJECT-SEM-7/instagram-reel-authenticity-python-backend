@@ -6,6 +6,7 @@ from langchain_core.output_parsers import JsonOutputParser
 from pydantic import BaseModel, Field
 from core.config import settings
 from src.websearchengine.pipeline import pipeline
+from fastapi import WebSocket
 
 
 class ClaimVerificationResult(BaseModel):
@@ -33,12 +34,12 @@ def create_unverifiable_result(claim: str, error_reason: str) -> Dict[str, Any]:
     }
 
 
-def verify_claim_with_web_search(claim: str, evidence: str) -> Dict[str, Any]:
+async def verify_claim_with_web_search(claim: str, evidence: str, websocket: WebSocket = None) -> Dict[str, Any]:
     """Verify a claim using web search and evidence."""
     try:
         # Use the existing web search pipeline
         search_query = claim
-        web_results = pipeline(search_query)
+        web_results = await pipeline(search_query, websocket)
         
         if web_results.get("error"):
             # print(f"Web search error: {web_results['error']}")

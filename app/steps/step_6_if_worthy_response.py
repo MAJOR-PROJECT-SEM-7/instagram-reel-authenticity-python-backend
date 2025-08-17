@@ -3,23 +3,31 @@ from app.steps.substeps.step_6a_can_llm_check import can_verify_with_llm
 from app.steps.substeps.step_6b_check_with_llm import verify_claim_with_llm
 from app.steps.substeps.step_6c_check_on_web import verify_claim_with_web_search
 from app.steps.substeps.step_6d_generate_overall_results import generate_overall_assessment
+from fastapi import WebSocket
+import json
 
-def if_worthy_response(claims: List[Dict[str, Any]],log: bool = False) -> Dict[str, Any]:
+async def if_worthy_response(claims: List[Dict[str, Any]],log: bool = False, websocket: WebSocket = None) -> Dict[str, Any]:
     """Generate a response for a worthy video."""
     claim_results = []
     if log:
         print(f'Verifying {len(claims)} claims')
+    if websocket:
+        await websocket.send_text(json.dumps({"step": "processing", "message": f"Verifying {len(claims)} claims"}))
     for claim in claims:
         if claim['is_worth_verifying']:
             can_llm_verify = can_verify_with_llm(claim['claim'])
             if can_llm_verify['can_verify_with_llm']:
                 if log:
                     print(f"Verifying claim: {claim['claim']} with LLM")
+                if websocket:
+                    await websocket.send_text(json.dumps({"step": "processing", "message": f"Verifying claim: {claim['claim']} with LLM"}))
                 claim_result = verify_claim_with_llm(claim['claim'], claim['evidence'])
             else:
                 if log:
                     print(f"Verifying claim: {claim['claim']} with web search")
-                claim_result = verify_claim_with_web_search(claim['claim'], claim['evidence'])
+                if websocket:
+                    await websocket.send_text(json.dumps({"step": "processing", "message": f"Verifying claim: {claim['claim']} with web search"}))
+                claim_result = await verify_claim_with_web_search(claim['claim'], claim['evidence'], websocket)
             claim_results.append(claim_result)
         else:
             if log:

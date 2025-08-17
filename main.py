@@ -5,6 +5,7 @@ import json
 from testing_backend.auth import router as auth_router
 from testing_backend.entires import router as entries_router
 from fastapi.middleware.cors import CORSMiddleware
+from websocketbackend.socket import websocket_backend
 
 app = FastAPI()
 app.add_middleware(
@@ -43,7 +44,7 @@ async def check_authenticity_websocket_endpoint(websocket: WebSocket):
             return
         
         # Process the authenticity check with WebSocket updates
-        await check_authenticity_websocket(websocket, url)
+        await websocket_backend(websocket, url)
         
     except WebSocketDisconnect:
         print("WebSocket disconnected")

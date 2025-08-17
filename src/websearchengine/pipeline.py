@@ -4,8 +4,9 @@ from src.websearchengine.scraper import scrape_all_urls
 from src.websearchengine.embedder import embed_and_search
 from src.websearchengine.summarizer import summarize_data
 from src.websearchengine.queryOptimizer import optimize_query
+from fastapi import WebSocket
 
-def pipeline(query: str) -> Dict[str, Any]:
+async def pipeline(query: str , websocket: WebSocket = None) -> Dict[str, Any]:
     if not query or not isinstance(query, str):
         return {"summary": [], "sources": [], "error": "Invalid query"}
     
@@ -16,7 +17,7 @@ def pipeline(query: str) -> Dict[str, Any]:
     if not urls:
         return {"summary": [], "sources": [], "error": "No search results found"}
     
-    raw_data = scrape_all_urls(urls)
+    raw_data = await scrape_all_urls(urls , websocket)
     # print(raw_data)
     
     if not raw_data:

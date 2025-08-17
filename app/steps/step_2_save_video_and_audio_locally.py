@@ -29,6 +29,23 @@ def save_video_and_audio_locally(url: str, filename: str,log: bool = False):
         if not url or not filename:
             return {"success": False}
 
+        # Check if video and audio already exist
+        video_path = VIDEO_DIR / filename
+        video_name = os.path.splitext(filename)[0]
+        audio_path = AUDIO_DIR / f"{video_name}.mp3"
+        
+        if video_path.exists() and audio_path.exists():
+            if log:
+                print("Video and audio already exist, skipping download and processing")
+            video_url = f"/reels/video/{filename}"
+            audio_filename = f"{video_name}.mp3"
+            audio_url = f"/reels/audio/{audio_filename}"
+            return {
+                "success": True,
+                "video": video_url,
+                "audio": audio_url
+            }
+
         if log:
             print("Downloading video")
         video_path = download_reel(url, filename)

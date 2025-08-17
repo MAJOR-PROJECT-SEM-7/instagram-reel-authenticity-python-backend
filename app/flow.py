@@ -25,6 +25,7 @@ def check_authenticity(url: str, log: bool = False):
             results['final'] = link
             return results
         return link
+        
 
     # save the video and audio locally
     if log:
