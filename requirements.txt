@@ -9,7 +9,8 @@ langchain_core
 langchain_google_genai
 beautifulsoup4
 openai-whisper
-sentence_transformers
+transformers==4.46.1
+sentence-transformers==5.1.2
 numpy
 httpx
 duckduckgo_search
