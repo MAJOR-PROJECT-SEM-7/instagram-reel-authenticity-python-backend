@@ -25,7 +25,8 @@ app.include_router(entries_router, prefix="/api")
 async def check_authenticity_endpoint(request_data: dict):
     url = request_data.get("url")
     log = request_data.get("log", False)
-    return check_authenticity(url, log)
+    result = await check_authenticity(url, log)
+    return result
 
 
 @app.websocket("/api/checkAuthenticityWS")

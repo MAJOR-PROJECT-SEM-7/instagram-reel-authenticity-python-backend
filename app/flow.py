@@ -6,7 +6,7 @@ from app.steps.step_5_if_not_worthy_response import not_worthy_response
 from app.steps.step_6_if_worthy_response import if_worthy_response
 import json
 
-def check_authenticity(url: str, log: bool = False):
+async def check_authenticity(url: str, log: bool = False):
     if log:
         results = {}
 
@@ -92,7 +92,7 @@ def check_authenticity(url: str, log: bool = False):
     # if the video is worthy, get the if worthy response
     if log:
         print("Video is worthy")
-    if_worthy_response_data = if_worthy_response(description['analysis']['claims'], log)
+    if_worthy_response_data = await if_worthy_response(description['analysis']['claims'], log)
     if log:
         print("If worthy response generated")
         results['if_worthy_response'] = if_worthy_response_data
