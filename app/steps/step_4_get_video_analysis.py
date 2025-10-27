@@ -58,7 +58,7 @@ def generate_description_from_video(video_url: str, transcript: Optional[str] = 
             return {"success": False}
 
         llm = ChatGoogleGenerativeAI(
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             google_api_key=google_api_key,
             temperature=0.1,
         )

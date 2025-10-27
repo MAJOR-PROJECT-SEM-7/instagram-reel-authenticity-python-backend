@@ -14,7 +14,7 @@ def analysis_to_text(analysis: Dict[str, Any]) -> str:
 def not_worthy_response(description: Union[str, Dict[str, Any]], category: str) -> Dict[str, Any]:
     try:
         llm = ChatGoogleGenerativeAI(
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             temperature=0.3
         )
         parser = JsonOutputParser()

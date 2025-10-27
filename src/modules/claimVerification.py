@@ -31,7 +31,7 @@ def can_verify_with_llm(claim: str) -> Dict[str, Any]:
     """Determine if a claim can be verified using LLM knowledge alone."""
     try:
         llm = ChatGoogleGenerativeAI(
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             google_api_key=settings.GOOGLE_API_KEY,
             temperature=0.1
         )
@@ -86,7 +86,7 @@ def verify_claim_with_llm(claim: str, evidence: str) -> Dict[str, Any]:
     """Verify a claim using LLM knowledge alone."""
     try:
         llm = ChatGoogleGenerativeAI(
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             google_api_key=settings.GOOGLE_API_KEY,
             temperature=0.1
         )
@@ -177,7 +177,7 @@ def verify_claim_with_web_search(claim: str, evidence: str) -> Dict[str, Any]:
         
         # Now use LLM to analyze the web search results
         llm = ChatGoogleGenerativeAI(
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             google_api_key=settings.GOOGLE_API_KEY,
             temperature=0.1
         )
@@ -288,7 +288,7 @@ def generate_overall_assessment(claim_results: List[Dict[str, Any]]) -> Dict[str
     """Generate an overall assessment based on individual claim results."""
     try:
         llm = ChatGoogleGenerativeAI(
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             google_api_key=settings.GOOGLE_API_KEY,
             temperature=0.2
         )

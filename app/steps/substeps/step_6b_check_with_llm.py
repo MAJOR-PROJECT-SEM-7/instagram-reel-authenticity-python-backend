@@ -22,7 +22,7 @@ def verify_claim_with_llm(claim: str, evidence: str) -> Dict[str, Any]:
     """Verify a claim using LLM knowledge alone."""
     try:
         llm = ChatGoogleGenerativeAI(
-            model="gemini-1.5-flash",
+            model="gemini-2.5-flash",
             google_api_key=settings.GOOGLE_API_KEY,
             temperature=0.1
         )
