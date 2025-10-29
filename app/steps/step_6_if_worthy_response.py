@@ -42,6 +42,9 @@ async def if_worthy_response(claims: List[Dict[str, Any]],log: bool = False, web
                 "evidence_sources": None,
                 "confidence": 1.0
             })
+        if websocket:
+            truncated_claim = claim['claim'][:100] + "..." if len(claim['claim']) > 100 else claim['claim']
+            await websocket.send_text(json.dumps({"step": "success", "message": f"Claim: {truncated_claim} verified with {claim_result['verification_method']}"}))
     if log:
         print(f'Generated {len(claim_results)} claim results')
     overall_assessment = generate_overall_assessment(claim_results)
