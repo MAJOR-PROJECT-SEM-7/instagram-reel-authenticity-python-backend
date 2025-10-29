@@ -37,6 +37,7 @@ Create a `.env` file in the project root and add your Google Gemini API key:
 
 ```env
 GOOGLE_API_KEY="your-gemini-api-key"
+PERPLEXITY_KEY="your-perplexity-key"
 ```
 
 ---
