@@ -1,5 +1,5 @@
 import requests
-from core.config import settings
+from src.core.config import settings
 from fastapi import WebSocket
 from typing import Dict, Any
 import json

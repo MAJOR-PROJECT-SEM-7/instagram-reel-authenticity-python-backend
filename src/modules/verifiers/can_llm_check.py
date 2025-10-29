@@ -2,7 +2,7 @@ from typing import Dict, Any
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
-from core.config import settings
+from src.core.config import settings
 
 def can_verify_with_llm(claim: str) -> Dict[str, Any]:
     """Determine if a claim can be verified using LLM knowledge alone."""

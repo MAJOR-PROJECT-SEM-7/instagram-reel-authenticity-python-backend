@@ -3,9 +3,9 @@ import json
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
+from src.modules.web_content_extractor.pipeline import pipeline
 from pydantic import BaseModel, Field
-from core.config import settings
-from src.websearchengine.pipeline import pipeline
+from src.core.config import settings
 from fastapi import WebSocket
 
 

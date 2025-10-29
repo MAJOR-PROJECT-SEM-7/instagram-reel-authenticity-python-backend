@@ -1,13 +1,13 @@
-from fastapi import WebSocket
-from app.steps.step_1_get_url_from_link import get_link_from_url
-from app.steps.step_2_save_video_and_audio_locally import save_video_and_audio_locally
-from app.steps.step_3_get_audio_transcription import audio_to_text
-from app.steps.step_4_get_video_analysis import generate_description_from_video
-from src.modules.notWorthyResponse import not_worthy_response
-from app.steps.step_6_if_worthy_response import if_worthy_response
 import json
+from fastapi import WebSocket
+from src.helper_functions.if_worthy_response import if_worthy_response
+from src.helper_functions.get_audio_transcription import audio_to_text
+from src.helper_functions.get_url_from_link import get_link_from_url
+from src.helper_functions.get_video_analysis import generate_description_from_video
+from src.helper_functions.not_worthy_response import not_worthy_response
+from src.helper_functions.save_video_and_audio_locally import save_video_and_audio_locally
 
-async def websocket_backend(websocket: WebSocket, url: str):
+async def handle_request(websocket:WebSocket, url:str):
     try:
         await websocket.send_text(json.dumps({"step": "processing", "message": "Extracting link from url"}))
         link = get_link_from_url(url)
@@ -64,5 +64,3 @@ async def websocket_backend(websocket: WebSocket, url: str):
             await websocket.close()
         except:
             pass
-
-    

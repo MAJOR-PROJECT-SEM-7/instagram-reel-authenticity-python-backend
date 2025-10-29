@@ -1,9 +1,9 @@
 from typing import Dict, Any, List
-from app.steps.substeps.step_6a_can_llm_check import can_verify_with_llm
-from app.steps.substeps.step_6b_check_with_llm import verify_claim_with_llm
-from app.steps.substeps.step_6c_check_on_web import verify_claim_with_web_search
-from app.steps.substeps.step_6d_generate_overall_results import generate_overall_assessment
-from app.steps.substeps.step_6e_verify_claim_with_perplexity import verify_claim_with_perplexity
+from  src.modules.verifiers.can_llm_check import can_verify_with_llm
+from  src.modules.verifiers.check_with_llm import verify_claim_with_llm
+from  src.modules.verifiers.check_on_web import verify_claim_with_web_search
+from  src.modules.verifiers.generate_overall_results import generate_overall_assessment
+from  src.modules.verifiers.verify_claim_with_perplexity import verify_claim_with_perplexity
 from fastapi import WebSocket
 import json
 
@@ -56,12 +56,3 @@ async def if_worthy_response(claims: List[Dict[str, Any]],log: bool = False, web
     if log:
         print(f'Generated overall assessment')
     return overall_assessment
-
-
-
-    #         {
-    #             "claim": string,
-    #             "evidence": string,
-    #             "is_worth_verifying": boolean
-    #         }
-    #     ]
