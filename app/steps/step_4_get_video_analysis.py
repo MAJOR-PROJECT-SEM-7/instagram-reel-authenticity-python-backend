@@ -83,10 +83,34 @@ Tasks:
     - evidence: What in the video supports it? (captions, speech, visuals)
     - is_worth_verifying: Whether it seems controversial, exaggerated, or false enough to need checking.
 
+CRITICAL: Only include claims that are NOT universally known or obvious facts.
+
+DO NOT include claims that are:
+- Common knowledge (e.g., "the sun is hot", "water is wet", "the Earth is round")
+- Basic scientific facts taught in elementary school (e.g., "humans need oxygen", "ice is cold")
+- Obvious statements everyone agrees on (e.g., "companies spend money on development", "technology is advancing")
+- Self-evident truths (e.g., "time passes", "people need food to survive")
+
+DO include claims that are:
+- Specific statistics or numbers that can be verified (e.g., "Company X spent $5 billion on AI in 2024")
+- Controversial or disputed statements
+- Claims about recent events or breaking news
+- Allegations about specific people, companies, or entities
+- Health/medical advice or claims
+- Political statements or policies
+- Specific prices, dates, locations, or measurements
+- Claims that could be misleading or false
+- Anything that would make someone think "Is that really true? I should check that."
+
+Ask yourself for each claim: "Would a reasonable person need to verify this, or is it common knowledge?"
+If it's common knowledge, do NOT include it.
+
 Special instruction:
-- If the video is about the sale of something (such as a product, service, or item being offered for purchase), the claim should be written in the following format: "this item is at this price in this place" (for example, "This phone is available for $299 at StoreX , City , State , Country "). Make sure to extract the item, price, and place from the video if possible, and use this format for the claim.
+- If the video is about the sale of something (such as a product, service, or item being offered for purchase), the claim should be written in the following format: "this item is at this price in this place" (for example, "This phone is available for $299 at StoreX, City, State, Country"). Make sure to extract the item, price, and place from the video if possible, and use this format for the claim.
 - DO NOT use general words like "this" or "that" keep it specific as it will be used to verify the claim.
 - If transcript is provided, and its good enough, use it more to understand the context of the video.
+
+Remember: Quality over quantity. Only extract claims that genuinely need fact-checking, not obvious truths.
 """
 
         if transcript:
