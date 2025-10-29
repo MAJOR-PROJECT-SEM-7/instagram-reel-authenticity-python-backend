@@ -3,7 +3,7 @@ from app.steps.step_1_get_url_from_link import get_link_from_url
 from app.steps.step_2_save_video_and_audio_locally import save_video_and_audio_locally
 from app.steps.step_3_get_audio_transcription import audio_to_text
 from app.steps.step_4_get_video_analysis import generate_description_from_video
-from app.steps.step_5_if_not_worthy_response import not_worthy_response
+from src.modules.notWorthyResponse import not_worthy_response
 from app.steps.step_6_if_worthy_response import if_worthy_response
 import json
 

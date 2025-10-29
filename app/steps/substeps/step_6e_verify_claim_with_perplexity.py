@@ -27,7 +27,7 @@ Provide a thorough fact-check analysis with web-based evidence and respond in va
 {{
     "claim": "{claim}",
     "can_verify_with_llm": false,
-    "verification_method": "web_search",
+    "verification_method": "perplexity",
     "authenticity_score": <float between 0.0-1.0>,
     "authenticity_label": "<one of: True, False, Partially True, Misleading, Unverifiable>",
     "explanation": "<detailed explanation based on web evidence with sources>",
