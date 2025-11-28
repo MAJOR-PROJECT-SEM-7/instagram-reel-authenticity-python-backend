@@ -7,10 +7,10 @@ from src.helper_functions.get_video_analysis import generate_description_from_vi
 from src.helper_functions.not_worthy_response import not_worthy_response
 from src.helper_functions.save_video_and_audio_locally import save_video_and_audio_locally
 
-async def handle_request(websocket:WebSocket, url:str):
+async def handle_request(websocket:WebSocket, url:str, model=None):
     try:
         await websocket.send_text(json.dumps({"step": "processing", "message": "Extracting link from url"}))
-        link = get_link_from_url(url)
+        link = await get_link_from_url(url)
         if not link.get('success'):
             await websocket.send_text(json.dumps({"step": "error", "message": "Invalid URL"}))
             await websocket.close()
@@ -19,7 +19,7 @@ async def handle_request(websocket:WebSocket, url:str):
             await websocket.send_text(json.dumps({"step": "success", "message": "Extracted link from url"}))
         
         await websocket.send_text(json.dumps({"step": "processing", "message": "Saving video and audio locally"}))
-        video_and_audio = save_video_and_audio_locally(link['videoUrl'], link['filename']) 
+        video_and_audio = await save_video_and_audio_locally(link['videoUrl'], link['filename']) 
         if not video_and_audio.get('success'):
             await websocket.send_text(json.dumps({"step": "error", "message": "Failed to save video and audio locally"}))
             await websocket.close()
@@ -28,13 +28,16 @@ async def handle_request(websocket:WebSocket, url:str):
             await websocket.send_text(json.dumps({"step": "success", "message": "Video and audio saved locally"}))
         
         await websocket.send_text(json.dumps({"step": "processing", "message": "Getting audio transcription"}))
-        audio_transcription = audio_to_text(video_and_audio['audio'])
+        
+        # Pass the model to audio_to_text and await it
+        audio_transcription = await audio_to_text(video_and_audio['audio'], model)
+        
         if not audio_transcription:
             await websocket.send_text(json.dumps({"step": "warning", "message": "Failed to get audio transcription, proceeding with video analysis"}))
         await websocket.send_text(json.dumps({"step": "success", "message": "Audio transcription generated"}))
         
         await websocket.send_text(json.dumps({"step": "processing", "message": "Generating video analysis"}))
-        video_analysis = generate_description_from_video(video_and_audio['video'], audio_transcription)
+        video_analysis = await generate_description_from_video(video_and_audio['video'], audio_transcription)
         if not video_analysis.get('success'):
             await websocket.send_text(json.dumps({"step": "error", "message": "Failed to generate video analysis"}))
             await websocket.close()

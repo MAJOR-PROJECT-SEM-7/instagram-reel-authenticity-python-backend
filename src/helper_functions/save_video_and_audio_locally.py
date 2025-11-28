@@ -2,8 +2,10 @@ import os
 import ffmpeg
 from audio_extract import extract_audio
 import subprocess
-import requests
+import httpx
 from pathlib import Path
+import asyncio
+from functools import partial
 
 ROOT_DIR = Path.cwd() / "reels"
 VIDEO_DIR = ROOT_DIR / "video"
@@ -24,7 +26,7 @@ def check_ffmpeg_installation() -> bool:
     except (subprocess.CalledProcessError, FileNotFoundError):
         return False
 
-def save_video_and_audio_locally(url: str, filename: str,log: bool = False):
+async def save_video_and_audio_locally(url: str, filename: str, log: bool = False):
     try:
         if not url or not filename:
             return {"success": False}
@@ -48,26 +50,32 @@ def save_video_and_audio_locally(url: str, filename: str,log: bool = False):
 
         if log:
             print("Downloading video")
-        video_path = download_reel(url, filename)
+        video_path = await download_reel(url, filename)
         if log:
             if video_path:
                 print("Video downloaded")
             else:
                 print("Failed to download video")
-        if log:
-            print("Converting video to audio")
+        
         if not video_path:
             return {"success": False}
 
         if log:
-            print("Compressing video")
-        audio_path = video_to_audio(video_path)
-        if not audio_path:
+            print("Converting video to audio")
+        
+        # Run audio extraction in executor
+        loop = asyncio.get_running_loop()
+        audio_path_str = await loop.run_in_executor(None, video_to_audio, video_path)
+        
+        if not audio_path_str:
             return {"success": False}
 
         if log:
             print("Compressing video")
-        compressed_video_path = compress_reel(video_path)
+        
+        # Run compression in executor
+        compressed_video_path = await loop.run_in_executor(None, compress_reel, video_path)
+        
         if log:
             if compressed_video_path:
                 print("Video compressed")
@@ -77,7 +85,7 @@ def save_video_and_audio_locally(url: str, filename: str,log: bool = False):
             return {"success": False}
         
         video_url = f"/reels/video/{filename}"
-        audio_filename = os.path.basename(audio_path)
+        audio_filename = os.path.basename(audio_path_str)
         audio_url = f"/reels/audio/{audio_filename}"
 
         return {
@@ -88,18 +96,18 @@ def save_video_and_audio_locally(url: str, filename: str,log: bool = False):
     except Exception:
         return {"success": False}
 
-def download_reel(url: str, filename: str) -> str:
+async def download_reel(url: str, filename: str) -> str:
     try:
         file_path = VIDEO_DIR / filename
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
         }
-        response = requests.get(url, stream=True, timeout=30, headers=headers)
-        response.raise_for_status()
-        with open(file_path, 'wb') as writer:
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:
-                    writer.write(chunk)
+        async with httpx.AsyncClient() as client:
+            async with client.stream("GET", url, headers=headers, timeout=30.0) as response:
+                response.raise_for_status()
+                with open(file_path, 'wb') as writer:
+                    async for chunk in response.aiter_bytes(chunk_size=8192):
+                        writer.write(chunk)
         return str(file_path)
     except Exception:
         return None
@@ -141,43 +149,13 @@ def compress_reel(video_path: str) -> str:
         except ffmpeg.Error:
             return None
 
-        compressed_size = temp_path.stat().st_size / (1024 * 1024)
-        if compressed_size > 3:
-            final_temp_path = VIDEO_DIR / f"final_temp_{input_path.name}"
-            try:
-                (
-                    ffmpeg
-                    .input(str(temp_path))
-                    .output(
-                        str(final_temp_path),
-                        vcodec='libx264',
-                        preset='fast',
-                        crf=32,
-                        maxrate='800k',
-                        bufsize='1600k',
-                        acodec='aac',
-                        audio_bitrate='96k',
-                        movflags='+faststart',
-                        vf='scale=640:-2'
-                    )
-                    .overwrite_output()
-                    .run(capture_stdout=True, quiet=True)
-                )
-            except ffmpeg.Error:
-                return None
-            temp_path.unlink()
-            final_temp_path.rename(temp_path)
-
         input_path.unlink()
         temp_path.rename(input_path)
         return str(input_path)
     except Exception:
         temp_path = VIDEO_DIR / f"temp_{Path(video_path).name}"
-        final_temp_path = VIDEO_DIR / f"final_temp_{Path(video_path).name}"
         if temp_path.exists():
             temp_path.unlink()
-        if final_temp_path.exists():
-            final_temp_path.unlink()
         return None
 
 def video_to_audio(video_path: str) -> str:

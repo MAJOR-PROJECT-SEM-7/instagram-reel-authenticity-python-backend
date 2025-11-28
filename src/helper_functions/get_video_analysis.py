@@ -39,7 +39,7 @@ class VideoAnalysis(BaseModel):
     is_worthy: bool = Field(description="Whether the overall video is worth verifying")
     why_not_worthy: Optional[str] = Field(description="If not worthy, explain why. Else, null")
 
-def generate_description_from_video(video_url: str, transcript: Optional[str] = None) -> Dict[str, Any]:
+async def generate_description_from_video(video_url: str, transcript: Optional[str] = None) -> Dict[str, Any]:
     try:
         if not video_url:
             return {"success": False}
@@ -158,7 +158,7 @@ Use the transcript below to understand context. Do not include it in your final 
             ]
         )
 
-        response = llm.invoke([message])
+        response = await llm.ainvoke([message])
 
         try:
             parsed_analysis = parser.parse(response.content)

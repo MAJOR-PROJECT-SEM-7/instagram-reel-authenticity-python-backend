@@ -20,11 +20,36 @@ def can_verify_with_llm(claim: str) -> Dict[str, Any]:
 
         Claim: "{claim}"
 
-        Consider these factors:
-        1. Is this about general knowledge, historical facts, scientific principles, a event or news happened in the past or well-established information?
-        2. Does it require current events, recent news, specific statistics, or real-time data?
-        3. Does it involve specific people, companies, or events that might have recent developments?
-        4. Is this a fact or an opinion?
+        CRITICAL RULES - LLMs CANNOT verify claims about:
+        1. **Specific events** - Any claim about something that happened to specific people, at specific places, or at specific times (e.g., "Person X did Y at Z event")
+        2. **Recent news or current events** - Anything that happened recently or is ongoing
+        3. **Specific statistics or data points** - Exact numbers, prices, dates that need verification
+        4. **Personal activities of public figures** - What celebrities, politicians, or public figures did/said recently
+        5. **Viral content or trending topics** - Claims about things "going viral" or trending
+        6. **Company-specific claims** - Specific actions, announcements, or data about particular companies
+        7. **Location-specific information** - Prices, availability, or conditions at specific places
+
+        LLMs CAN verify claims about:
+        1. **Universal scientific facts** - Laws of physics, chemistry, biology (e.g., "Water boils at 100°C at sea level")
+        2. **Well-established historical facts** - Major historical events with consensus (e.g., "World War II ended in 1945")
+        3. **Mathematical truths** - Basic math, logic, established theorems
+        4. **General conceptual knowledge** - Definitions, concepts, theories that are well-established
+        5. **Common sense reasoning** - Logical deductions from known principles
+
+        EXAMPLES:
+        ❌ CANNOT verify with LLM: "Rohit Sharma and his wife danced at her brother's wedding and went viral"
+           → Requires web search (specific event about specific people)
+        
+        ❌ CANNOT verify with LLM: "Company X launched a new product at $299"
+           → Requires web search (specific company action and price)
+        
+        ✅ CAN verify with LLM: "Water is composed of hydrogen and oxygen"
+           → General scientific fact
+        
+        ✅ CAN verify with LLM: "The Earth orbits around the Sun"
+           → Well-established scientific fact
+
+        **DEFAULT STANCE**: When in doubt, assume the claim CANNOT be verified with LLM alone. It's better to use web search than to rely on potentially outdated or incomplete LLM knowledge.
 
         Respond in JSON format:
         {{

@@ -2,7 +2,7 @@ import re
 import json
 import urllib.parse
 from typing import Dict, Any, Optional
-import requests
+import httpx
 from bs4 import BeautifulSoup
 
 
@@ -12,7 +12,7 @@ class HTTPError(Exception):
         self.status = status
 
 
-def get_link_from_url(url: str) -> Dict[str, Any]:
+async def get_link_from_url(url: str) -> Dict[str, Any]:
     if not url:
         raise ValueError("URL is required")
 
@@ -21,25 +21,25 @@ def get_link_from_url(url: str) -> Dict[str, Any]:
         raise ValueError(validation_error)
 
     try:
-        post_id = get_post_id_from_url(url)
+        post_id = await get_post_id_from_url(url)
         if not post_id:
             raise ValueError("Invalid Post URL - Could not extract ID")
 
-        post_json = get_video_info(post_id)
+        post_json = await get_video_info(post_id)
         post_json['success'] = True
         return post_json
     except Exception as error:
         return {'success': False, 'message': str(error)}
 
 
-def get_post_id_from_url(post_url: str) -> str:
+async def get_post_id_from_url(post_url: str) -> str:
     share_regex = r"^https://(?:www\.)?instagram\.com/share/([a-zA-Z0-9_-]+)/?.*"
     post_regex = r"^https://(?:www\.)?instagram\.com/p/([a-zA-Z0-9_-]+)/?.*"
     reel_regex = r"^https://(?:www\.)?instagram\.com/reels?/([a-zA-Z0-9_-]+)/?.*"
 
     if re.match(share_regex, post_url):
         try:
-            reel_id = fetch_reel_id_from_share_url(post_url)
+            reel_id = await fetch_reel_id_from_share_url(post_url)
             return reel_id
         except Exception as error:
             raise error
@@ -55,13 +55,15 @@ def get_post_id_from_url(post_url: str) -> str:
     raise ValueError("Unable to extract ID from URL")
 
 
-def fetch_reel_id_from_share_url(share_url):
+async def fetch_reel_id_from_share_url(share_url):
     try:
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
         }
-        response = requests.get(share_url, headers=headers, allow_redirects=True)
-        if not response.ok:
+        async with httpx.AsyncClient(follow_redirects=True) as client:
+            response = await client.get(share_url, headers=headers)
+        
+        if response.status_code != 200:
             raise ValueError(f"Failed to fetch share URL: {response.status_code}")
 
         patterns = [
@@ -70,7 +72,7 @@ def fetch_reel_id_from_share_url(share_url):
             r"/reels/([a-zA-Z0-9_-]+)"
         ]
         for pattern in patterns:
-            match = re.search(pattern, response.url)
+            match = re.search(pattern, str(response.url))
             if match and match.group(1):
                 return match.group(1)
 
@@ -186,8 +188,8 @@ def format_page_json(post_html, reel_id):
     }
 
 
-def get_video_json_from_html(post_id):
-    data = get_post_page_html(post_id)
+async def get_video_json_from_html(post_id):
+    data = await get_post_page_html(post_id)
     post_html = BeautifulSoup(data, 'html.parser')
     video_element = post_html.find("meta", {"property": "og:video"})
     if not video_element:
@@ -195,8 +197,8 @@ def get_video_json_from_html(post_id):
     return format_page_json(post_html, post_id)
 
 
-def get_video_json_from_graphql(post_id):
-    data = get_post_graphql_data(post_id)
+async def get_video_json_from_graphql(post_id):
+    data = await get_post_graphql_data(post_id)
     media_data = data.get("data", {}).get("xdt_shortcode_media")
     if not media_data:
         return None
@@ -205,16 +207,16 @@ def get_video_json_from_graphql(post_id):
     return format_graphql_json(media_data, post_id)
 
 
-def get_video_info(post_id: str) -> Dict[str, Any]:
+async def get_video_info(post_id: str) -> Dict[str, Any]:
     try:
-        video_info = get_video_json_from_html(post_id)
+        video_info = await get_video_json_from_html(post_id)
         if video_info:
             return video_info
     except Exception:
         pass
 
     try:
-        video_info = get_video_json_from_graphql(post_id)
+        video_info = await get_video_json_from_graphql(post_id)
         if video_info:
             return video_info
     except Exception:
@@ -223,7 +225,7 @@ def get_video_info(post_id: str) -> Dict[str, Any]:
     raise ValueError("Video link for this post is not public or accessible.")
 
 
-def get_post_page_html(post_id):
+async def get_post_page_html(post_id):
     url = f"https://www.instagram.com/p/{post_id}/"
     headers = {
         "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
@@ -236,13 +238,15 @@ def get_post_page_html(post_id):
         "upgrade-insecure-requests": "1",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0",
     }
-    response = requests.get(url, headers=headers)
-    if not response.ok:
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, headers=headers)
+    
+    if response.status_code != 200:
         raise ValueError(f"Failed to fetch Instagram page: {response.status_code}")
     return response.text
 
 
-def get_post_graphql_data(post_id):
+async def get_post_graphql_data(post_id):
     encoded_data = encode_graphql_request_data(post_id)
     url = "https://www.instagram.com/api/graphql"
     headers = {
@@ -259,7 +263,9 @@ def get_post_graphql_data(post_id):
         "Sec-Fetch-Site": "same-origin",
         "User-Agent": "Mozilla/5.0 (Linux; Android 11; SAMSUNG SM-G973U) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/14.2 Chrome/87.0.4280.141 Mobile Safari/537.36",
     }
-    response = requests.post(url, data=encoded_data, headers=headers)
-    if not response.ok:
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, data=encoded_data, headers=headers)
+    
+    if response.status_code != 200:
         raise ValueError(f"GraphQL request failed: {response.status_code}")
     return response.json()
